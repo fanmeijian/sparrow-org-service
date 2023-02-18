@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import cn.sparrowmini.common.api.SparrowTree;
 import cn.sparrowmini.org.model.Group;
 import cn.sparrowmini.org.model.constant.GroupTypeEnum;
 import cn.sparrowmini.org.model.relation.OrganizationGroup;
-import cn.sparrowmini.org.service.impl.SparrowTree;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

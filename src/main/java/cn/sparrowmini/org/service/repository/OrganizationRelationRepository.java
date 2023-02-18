@@ -28,4 +28,6 @@ public interface OrganizationRelationRepository
   void deleteByIdIn(Set<OrganizationRelationPK> ids);
 
   void deleteByIdOrganizationId(String organizationId);
+  
+  void deleteByIdParentId(String organizationId);
 }

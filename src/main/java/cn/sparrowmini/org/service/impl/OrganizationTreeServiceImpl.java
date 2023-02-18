@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cn.sparrowmini.common.api.AbstractTreeService;
+import cn.sparrowmini.common.api.SparrowTree;
 import cn.sparrowmini.org.model.Organization;
 import cn.sparrowmini.org.model.relation.OrganizationRelation;
 import cn.sparrowmini.org.service.repository.OrganizationRelationRepository;

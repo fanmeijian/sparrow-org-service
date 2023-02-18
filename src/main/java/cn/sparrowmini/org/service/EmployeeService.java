@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import cn.sparrowmini.common.api.SparrowTree;
 import cn.sparrowmini.org.model.Employee;
 import cn.sparrowmini.org.model.relation.EmployeeOrganizationLevel;
 import cn.sparrowmini.org.model.relation.EmployeeOrganizationRole;
 import cn.sparrowmini.org.model.relation.EmployeeRelation;
 import cn.sparrowmini.org.model.relation.OrganizationPositionLevel.OrganizationPositionLevelPK;
 import cn.sparrowmini.org.model.relation.OrganizationRole.OrganizationRolePK;
-import cn.sparrowmini.org.service.impl.SparrowTree;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

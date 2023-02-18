@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import cn.sparrowmini.common.api.SparrowTree;
 import cn.sparrowmini.org.model.Employee;
 import cn.sparrowmini.org.model.Organization;
 import cn.sparrowmini.org.model.constant.OrganizationChildTypeEnum;
@@ -122,9 +123,11 @@ public class OrganizationServiceImpl extends AbstractPreserveScope implements Or
 	@Transactional
 	@ResponseStatus(code = HttpStatus.NO_CONTENT)
 	@PreAuthorize("hasAuthority('SCOPE_"+SCOPE_ADMIN_DELETE+"') or hasRole('ROLE_"+ROLE_SUPER_ADMIN+"')")
-	public void delete(String[] ids) {
-		organizationRelationRepository.deleteByIdOrganizationIdInOrIdParentIdIn(ids, ids);
-		organizationRepository.deleteByIdIn(ids);
+	public void delete(String organizationId) {
+		this.organizationRepository.deleteById(organizationId);
+		this.organizationRelationRepository.deleteByIdOrganizationId(organizationId);
+		this.organizationRelationRepository.deleteByIdParentId(organizationId);
+		
 	}
 
 	@Override
@@ -238,16 +241,14 @@ public class OrganizationServiceImpl extends AbstractPreserveScope implements Or
 	@Transactional
 	@ResponseStatus(code = HttpStatus.NO_CONTENT)
 	@PreAuthorize("hasAuthority('SCOPE_"+SCOPE_ADMIN_PARENT_REMOVE+"') or hasRole('ROLE_"+ROLE_SUPER_ADMIN+"')")
-	public void removeParent(String organizationId, List<String> parentIds) {
-		parentIds.forEach(f -> {
-			if (f.equals("root")) {
-				Organization organization = organizationRepository.getById(organizationId);
-				organization.setIsRoot(false);
-				organizationRepository.save(organization);
-			} else {
-				organizationRelationRepository.deleteById(new OrganizationRelationPK(organizationId, f));
-			}
-		});
+	public void removeParent(String organizationId, String parentId) {
+		if (parentId.equals("root")) {
+			Organization organization = organizationRepository.getById(organizationId);
+			organization.setIsRoot(false);
+			organizationRepository.save(organization);
+		} else {
+			organizationRelationRepository.deleteById(new OrganizationRelationPK(organizationId, parentId));
+		}
 
 		// 防止称为孤儿
 		if (organizationRelationRepository.findByIdOrganizationId(organizationId).size() == 0) {

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import cn.sparrowmini.common.api.SparrowTree;
 import cn.sparrowmini.org.model.Employee;
 import cn.sparrowmini.org.model.Group;
 import cn.sparrowmini.org.model.constant.GroupTypeEnum;
@@ -29,8 +30,6 @@ import cn.sparrowmini.org.model.relation.GroupRelation;
 import cn.sparrowmini.org.model.relation.GroupRelation.GroupRelationPK;
 import cn.sparrowmini.org.model.relation.GroupRole;
 import cn.sparrowmini.org.model.relation.GroupRole.GroupRolePK;
-import cn.sparrowmini.org.model.relation.GroupSysrole;
-import cn.sparrowmini.org.model.relation.GroupSysrole.GroupSysrolePK;
 import cn.sparrowmini.org.model.relation.GroupUser;
 import cn.sparrowmini.org.model.relation.GroupUser.GroupUserPK;
 import cn.sparrowmini.org.model.relation.OrganizationGroup;
@@ -43,7 +42,6 @@ import cn.sparrowmini.org.service.repository.GroupOrganizationRepository;
 import cn.sparrowmini.org.service.repository.GroupRelationRepository;
 import cn.sparrowmini.org.service.repository.GroupRepository;
 import cn.sparrowmini.org.service.repository.GroupRoleRepository;
-import cn.sparrowmini.org.service.repository.GroupSysroleRepository;
 import cn.sparrowmini.org.service.repository.GroupUserRepository;
 import cn.sparrowmini.org.service.repository.OrganizationGroupRepository;
 import cn.sparrowmini.org.service.repository.OrganizationLevelRepository;
@@ -72,9 +70,6 @@ public class GroupServiceImpl extends AbstractPreserveScope implements GroupServ
 	GroupLevelRepository groupLevelRepository;
 	@Autowired
 	GroupRelationRepository groupRelationRepository;
-	@Autowired
-	GroupSysroleRepository groupSysroleRepository;
-
 	@Autowired
 	OrganizationGroupRepository organizationGroupRepository;
 	@Autowired
@@ -203,10 +198,10 @@ public class GroupServiceImpl extends AbstractPreserveScope implements GroupServ
 			Page<GroupPositionLevel> levels = groupLevelRepository.findByIdGroupId(groupId, pageable);
 			levels.getContent().stream().map(m -> positionLevelRepository.findById(m.getId().getPositionLevelId()));
 			return levels;
-		case SYSROLE:
-			Page<GroupSysrole> sysroles = groupSysroleRepository.findByIdGroupId(groupId, pageable);
-			sysroles.getContent().stream().map(m -> positionLevelRepository.findById(m.getId().getSysroleId()));
-			return sysroles;
+//		case SYSROLE:
+//			Page<GroupSysrole> sysroles = groupSysroleRepository.findByIdGroupId(groupId, pageable);
+//			sysroles.getContent().stream().map(m -> positionLevelRepository.findById(m.getId().getSysroleId()));
+//			return sysroles;
 		case USER:
 			Page<GroupUser> users = groupUserRepository.findByIdGroupId(groupId, pageable);
 			users.getContent().stream().map(m -> positionLevelRepository.findById(m.getId().getUsername()));
@@ -240,9 +235,9 @@ public class GroupServiceImpl extends AbstractPreserveScope implements GroupServ
 			case LEVEL:
 				groupLevelRepository.save(new GroupPositionLevel(groupId, f.toString()));
 				break;
-			case SYSROLE:
-				groupSysroleRepository.save(new GroupSysrole(groupId, f.toString()));
-				break;
+//			case SYSROLE:
+//				groupSysroleRepository.save(new GroupSysrole(groupId, f.toString()));
+//				break;
 			case USER:
 				groupUserRepository.save(new GroupUser(groupId, f.toString()));
 				break;
@@ -274,9 +269,9 @@ public class GroupServiceImpl extends AbstractPreserveScope implements GroupServ
 			case LEVEL:
 				groupLevelRepository.deleteById(new GroupPositionLevelPK(groupId, f.toString()));
 				break;
-			case SYSROLE:
-				groupSysroleRepository.deleteById(new GroupSysrolePK(groupId, f.toString()));
-				break;
+//			case SYSROLE:
+//				groupSysroleRepository.deleteById(new GroupSysrolePK(groupId, f.toString()));
+//				break;
 			case USER:
 				groupUserRepository.deleteById(new GroupUserPK(groupId, f.toString()));
 				break;

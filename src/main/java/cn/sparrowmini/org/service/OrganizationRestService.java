@@ -1,6 +1,5 @@
 package cn.sparrowmini.org.service;
 
-
 import java.util.List;
 import java.util.Map;
 
@@ -9,20 +8,20 @@ import javax.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import cn.sparrowmini.common.api.SparrowTree;
 import cn.sparrowmini.org.model.Organization;
 import cn.sparrowmini.org.model.constant.OrganizationChildTypeEnum;
 import cn.sparrowmini.org.model.relation.OrganizationRelation;
-import cn.sparrowmini.org.service.impl.SparrowTree;
 import cn.sparrowmini.org.service.scope.PreserveScope;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -57,9 +56,9 @@ public interface OrganizationRestService extends PreserveScope {
 			@RequestBody Map<String, Object> map);
 
 	@Operation(summary = "删除组织")
-	@PutMapping("/delete")
+	@DeleteMapping("/{organizationId}")
 	@ResponseBody
-	public void delete(@NotNull @RequestBody String[] ids);
+	public void delete(@PathVariable String organizationId);
 
 	@Operation(summary = "添加所属上级")
 	@PostMapping("/{organizationId}/parents")
@@ -67,10 +66,9 @@ public interface OrganizationRestService extends PreserveScope {
 	public void addParent(@PathVariable("organizationId") String organizationId, @RequestBody List<String> parentIds);
 
 	@Operation(summary = "移除所属上级")
-	@PutMapping("/{organizationId}/parents/delete")
+	@DeleteMapping("/{organizationId}/parents/{parentId}")
 	@ResponseBody
-	public void removeParent(@PathVariable("organizationId") String organizationId,
-			@RequestBody List<String> parentIds);
+	public void removeParent(@PathVariable("organizationId") String organizationId, @PathVariable("parentId") String parentId);
 
 	@Operation(summary = "获取组织树")
 	@GetMapping("/tree")
