@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import cn.sparrowmini.common.api.SparrowTree;
 import cn.sparrowmini.org.model.Employee;
 import cn.sparrowmini.org.model.Organization;
+import cn.sparrowmini.org.model.common.CurrentUser;
 import cn.sparrowmini.org.model.constant.OrganizationChildTypeEnum;
 import cn.sparrowmini.org.model.relation.OrganizationGroup;
 import cn.sparrowmini.org.model.relation.OrganizationGroup.OrganizationGroupPK;
@@ -34,7 +35,6 @@ import cn.sparrowmini.org.service.GroupService;
 import cn.sparrowmini.org.service.OrganizationService;
 import cn.sparrowmini.org.service.PositionLevelService;
 import cn.sparrowmini.org.service.RoleService;
-import cn.sparrowmini.org.service.ScopePermission;
 import cn.sparrowmini.org.service.repository.EmployeeRepository;
 import cn.sparrowmini.org.service.repository.OrganizationGroupRepository;
 import cn.sparrowmini.org.service.repository.OrganizationLevelRepository;
@@ -44,6 +44,7 @@ import cn.sparrowmini.org.service.repository.OrganizationRepository;
 import cn.sparrowmini.org.service.repository.OrganizationRoleRelationRepository;
 import cn.sparrowmini.org.service.repository.OrganizationRoleRepository;
 import cn.sparrowmini.org.service.scope.OrgScope;
+import cn.sparrowmini.pem.service.ScopePermission;
 
 @Service
 public class OrganizationServiceImpl extends AbstractPreserveScope implements OrganizationService, OrgScope {
@@ -266,9 +267,10 @@ public class OrganizationServiceImpl extends AbstractPreserveScope implements Or
 	}
 
 	@Override
-	@PreAuthorize("hasAuthority('SCOPE_"+SCOPE_ADMIN_CHILD_LIST+"') or hasRole('ROLE_"+ROLE_ADMIN+"')")
+//	@PreAuthorize("hasAuthority('SCOPE_"+SCOPE_ADMIN_CHILD_LIST+"') or hasRole('ROLE_"+ROLE_ADMIN+"')")
+//	@ScopePermission(scope = SCOPE_ADMIN_CHILD_LIST)
 	public Page<?> getChildren(String organizationId, OrganizationChildTypeEnum type, Pageable pageable) {
-
+		System.out.println(CurrentUser.get());
 		switch (type) {
 		case ORGANIZATION:
 			if (organizationId.toLowerCase().equals("root")) {
