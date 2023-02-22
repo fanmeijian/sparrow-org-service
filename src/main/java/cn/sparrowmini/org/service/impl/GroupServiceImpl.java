@@ -30,8 +30,6 @@ import cn.sparrowmini.org.model.relation.GroupRelation;
 import cn.sparrowmini.org.model.relation.GroupRelation.GroupRelationPK;
 import cn.sparrowmini.org.model.relation.GroupRole;
 import cn.sparrowmini.org.model.relation.GroupRole.GroupRolePK;
-import cn.sparrowmini.org.model.relation.GroupUser;
-import cn.sparrowmini.org.model.relation.GroupUser.GroupUserPK;
 import cn.sparrowmini.org.model.relation.OrganizationGroup;
 import cn.sparrowmini.org.model.relation.OrganizationGroup.OrganizationGroupPK;
 import cn.sparrowmini.org.service.GroupService;
@@ -42,7 +40,6 @@ import cn.sparrowmini.org.service.repository.GroupOrganizationRepository;
 import cn.sparrowmini.org.service.repository.GroupRelationRepository;
 import cn.sparrowmini.org.service.repository.GroupRepository;
 import cn.sparrowmini.org.service.repository.GroupRoleRepository;
-import cn.sparrowmini.org.service.repository.GroupUserRepository;
 import cn.sparrowmini.org.service.repository.OrganizationGroupRepository;
 import cn.sparrowmini.org.service.repository.OrganizationLevelRepository;
 import cn.sparrowmini.org.service.repository.OrganizationRepository;
@@ -60,8 +57,8 @@ import cn.sparrowmini.org.service.scope.GroupScope;
 @Service
 public class GroupServiceImpl extends AbstractPreserveScope implements GroupService, GroupScope {
 
-	@Autowired
-	GroupUserRepository groupUserRepository;
+//	@Autowired
+//	GroupUserRepository groupUserRepository;
 	@Autowired
 	GroupOrganizationRepository groupOrganizationRepository;
 	@Autowired
@@ -202,10 +199,10 @@ public class GroupServiceImpl extends AbstractPreserveScope implements GroupServ
 //			Page<GroupSysrole> sysroles = groupSysroleRepository.findByIdGroupId(groupId, pageable);
 //			sysroles.getContent().stream().map(m -> positionLevelRepository.findById(m.getId().getSysroleId()));
 //			return sysroles;
-		case USER:
-			Page<GroupUser> users = groupUserRepository.findByIdGroupId(groupId, pageable);
-			users.getContent().stream().map(m -> positionLevelRepository.findById(m.getId().getUsername()));
-			return users;
+//		case USER:
+//			Page<GroupUser> users = groupUserRepository.findByIdGroupId(groupId, pageable);
+//			users.getContent().stream().map(m -> positionLevelRepository.findById(m.getId().getUsername()));
+//			return users;
 		case GROUP:
 			Page<GroupRelation> groups = groupRelationRepository.findByIdParentId(groupId, pageable);
 			groups.getContent().stream().map(m -> positionLevelRepository.findById(m.getId().getGroupId()));
@@ -238,9 +235,9 @@ public class GroupServiceImpl extends AbstractPreserveScope implements GroupServ
 //			case SYSROLE:
 //				groupSysroleRepository.save(new GroupSysrole(groupId, f.toString()));
 //				break;
-			case USER:
-				groupUserRepository.save(new GroupUser(groupId, f.toString()));
-				break;
+//			case USER:
+//				groupUserRepository.save(new GroupUser(groupId, f.toString()));
+//				break;
 			case GROUP:
 				groupRelationRepository.save(new GroupRelation(f.toString(),groupId));
 				break;
@@ -272,9 +269,9 @@ public class GroupServiceImpl extends AbstractPreserveScope implements GroupServ
 //			case SYSROLE:
 //				groupSysroleRepository.deleteById(new GroupSysrolePK(groupId, f.toString()));
 //				break;
-			case USER:
-				groupUserRepository.deleteById(new GroupUserPK(groupId, f.toString()));
-				break;
+//			case USER:
+//				groupUserRepository.deleteById(new GroupUserPK(groupId, f.toString()));
+//				break;
 			case GROUP:
 				groupRelationRepository.deleteById(new GroupRelationPK(f.toString(),groupId));
 			default:
