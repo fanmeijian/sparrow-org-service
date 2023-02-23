@@ -17,10 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import cn.sparrowmini.common.CurrentUser;
 import cn.sparrowmini.common.api.SparrowTree;
 import cn.sparrowmini.org.model.Employee;
 import cn.sparrowmini.org.model.Organization;
-import cn.sparrowmini.org.model.common.CurrentUser;
 import cn.sparrowmini.org.model.constant.OrganizationChildTypeEnum;
 import cn.sparrowmini.org.model.relation.OrganizationGroup;
 import cn.sparrowmini.org.model.relation.OrganizationGroup.OrganizationGroupPK;

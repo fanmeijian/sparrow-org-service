@@ -1,12 +1,13 @@
 package cn.sparrowmini.org.service;
 
-
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import cn.sparrowmini.common.api.SparrowTree;
 import cn.sparrowmini.org.model.Employee;
@@ -36,26 +38,27 @@ public interface EmployeeService {
 	@PostMapping("")
 	@ResponseBody
 	public Employee create(@RequestBody Employee employee);
-	
+
 	@Operation(summary = "员工详情")
 	@GetMapping("/{employeeId}")
 	@ResponseBody
 	public Employee get(@PathVariable("employeeId") String employeeId);
-	
+
 	@Operation(summary = "员工详情")
 	@GetMapping("/all")
 	@ResponseBody
-	public Page<Employee> all(@Nullable Pageable pageable,@Nullable Employee employee);
+	public Page<Employee> all(@Nullable Pageable pageable, @Nullable Employee employee);
 
 	@Operation(summary = "更新员工")
 	@PatchMapping("/{employeeId}")
 	@ResponseBody
 	@io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(implementation = Employee.class)))
-	public Employee update(@PathVariable("employeeId") String employeeId,@RequestBody Map<String, Object> map);
+	public Employee update(@PathVariable("employeeId") String employeeId, @RequestBody Map<String, Object> map);
 
 	@Operation(summary = "删除员工")
-	@PutMapping("/delete")
+	@DeleteMapping("")
 	@ResponseBody
+	@ResponseStatus(code = HttpStatus.NO_CONTENT)
 	public void delete(@RequestBody String[] ids);
 
 	@Operation(summary = "获取直接下属")
@@ -86,13 +89,14 @@ public interface EmployeeService {
 	@Operation(summary = "设置担任岗位")
 	@PostMapping("/{employeeId}/roles")
 	@ResponseBody
-	public void addRole(@PathVariable("employeeId") String employeeId, @RequestBody List<OrganizationRolePK> organizationRoleIds);
+	public void addRole(@PathVariable("employeeId") String employeeId,
+			@RequestBody List<OrganizationRolePK> organizationRoleIds);
 
 	@Operation(summary = "移除担任岗位")
-	@PutMapping("/{employeeId}/roles/delete")
+	@DeleteMapping("/{employeeId}/roles")
 	@ResponseBody
-	public void removeRole(@PathVariable("employeeId") String employeeId,
-			@RequestBody List<OrganizationRolePK> organizationRoleIds);
+	@ResponseStatus(code = HttpStatus.NO_CONTENT)
+	public void removeRole(@PathVariable String employeeId, @RequestBody List<OrganizationRolePK> organizationRoleIds);
 
 	@Operation(summary = "设置所属职级别")
 	@PostMapping("/{employeeId}/levels")
@@ -101,20 +105,22 @@ public interface EmployeeService {
 			@RequestBody List<OrganizationPositionLevelPK> organizationPositionLevelIds);
 
 	@Operation(summary = "移除所属职级别")
-	@PutMapping("/{employeeId}/levels/delete")
+	@DeleteMapping("/{employeeId}/levels")
 	@ResponseBody
-	public void removeLevel(@PathVariable("employeeId") String employeeId,
+	@ResponseStatus(code = HttpStatus.NO_CONTENT)
+	public void removeLevel(@PathVariable String employeeId,
 			@RequestBody List<OrganizationPositionLevelPK> organizationPositionLevelIds);
 
 	@Operation(summary = "设置员工上级")
 	@PostMapping("/{employeeId}/parents")
 	@ResponseBody
-	public void addParent(@PathVariable("employeeId") String employeeId, @RequestBody List<String> parentIds);
+	public void addParent(@PathVariable String employeeId, @RequestBody List<String> parentIds);
 
 	@Operation(summary = "移除员工上级")
-	@PutMapping("/{employeeId}/parents/delete")
+	@DeleteMapping("/{employeeId}/parents")
 	@ResponseBody
-	public void removeParent(@PathVariable("employeeId") String employeeId, @RequestBody List<String> parentIds);
+	@ResponseStatus(code = HttpStatus.NO_CONTENT)
+	public void removeParent(@PathVariable String employeeId, @RequestBody List<String> parentIds);
 
 	public long getChildCount(String employeeId);
 
