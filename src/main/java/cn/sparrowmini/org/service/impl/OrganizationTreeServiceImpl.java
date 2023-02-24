@@ -15,7 +15,7 @@ import cn.sparrowmini.org.service.repository.OrganizationRelationRepository;
 public class OrganizationTreeServiceImpl extends AbstractTreeService<Organization, String> {
 
   @Autowired
-  OrganizationRelationRepository organizationRelationRepository;
+  private OrganizationRelationRepository organizationRelationRepository;
 
   @Override
   public SparrowTree<Organization, String> buildTree(String parentId) {

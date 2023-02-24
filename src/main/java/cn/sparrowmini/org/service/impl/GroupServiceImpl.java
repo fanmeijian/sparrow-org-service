@@ -11,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -41,11 +40,11 @@ import cn.sparrowmini.org.service.repository.GroupRelationRepository;
 import cn.sparrowmini.org.service.repository.GroupRepository;
 import cn.sparrowmini.org.service.repository.GroupRoleRepository;
 import cn.sparrowmini.org.service.repository.OrganizationGroupRepository;
-import cn.sparrowmini.org.service.repository.OrganizationLevelRepository;
 import cn.sparrowmini.org.service.repository.OrganizationRepository;
 import cn.sparrowmini.org.service.repository.PositionLevelRepository;
 import cn.sparrowmini.org.service.repository.RoleRepository;
 import cn.sparrowmini.org.service.scope.GroupScope;
+import cn.sparrowmini.pem.service.ScopePermission;
 
 /**
  * 群组服务
@@ -57,54 +56,48 @@ import cn.sparrowmini.org.service.scope.GroupScope;
 @Service
 public class GroupServiceImpl extends AbstractPreserveScope implements GroupService, GroupScope {
 
-//	@Autowired
-//	GroupUserRepository groupUserRepository;
 	@Autowired
-	GroupOrganizationRepository groupOrganizationRepository;
+	private GroupOrganizationRepository groupOrganizationRepository;
 	@Autowired
-	GroupRoleRepository groupRoleRepository;
+	private GroupRoleRepository groupRoleRepository;
 	@Autowired
-	GroupLevelRepository groupLevelRepository;
+	private GroupLevelRepository groupLevelRepository;
 	@Autowired
-	GroupRelationRepository groupRelationRepository;
+	private GroupRelationRepository groupRelationRepository;
 	@Autowired
-	OrganizationGroupRepository organizationGroupRepository;
+	private OrganizationGroupRepository organizationGroupRepository;
 	@Autowired
-	GroupEmployeeRepository groupEmployeeRepository;
-
-	// @Autowired
-	// SubGroupRepository subGroupRepository;
+	private GroupEmployeeRepository groupEmployeeRepository;
 
 	@Autowired
-	GroupRepository groupRepository;
+	private GroupRepository groupRepository;
 	@Autowired
-	OrganizationRepository organizationRepository;
+	private OrganizationRepository organizationRepository;
+
 	@Autowired
-	OrganizationLevelRepository organizationLevelRepository;
+	private EmployeeRepository employeeRepository;
 	@Autowired
-	EmployeeRepository employeeRepository;
+	private RoleRepository roleRepository;
 	@Autowired
-	RoleRepository roleRepository;
-	@Autowired
-	PositionLevelRepository positionLevelRepository;
+	private PositionLevelRepository positionLevelRepository;
 
 	@Override
 	public SparrowTree<Group, String> getTree(String parentId) {
 		SparrowTree<Group, String> myTree = new SparrowTree<Group, String>(
-				parentId == null ? null : groupRepository.findById(parentId).orElse(null));
+				parentId == null ? null : this.groupRepository.findById(parentId).orElse(null));
 		buildTree(myTree);
 		return myTree;
 	}
 
 	public void buildTree(SparrowTree<Group, String> myTree) {
 
-		groupRelationRepository
+		this.groupRelationRepository
 				.findByIdParentId(myTree.getMe() == null ? null : myTree.getMe().getId(), Pageable.unpaged()).toList()
 				.forEach(f -> {
 					SparrowTree<Group, String> leaf = new SparrowTree<Group, String>(
-							groupRepository.findById(f.getId().getGroupId()).get());
+							this.groupRepository.findById(f.getId().getGroupId()).get());
 					// 防止死循环
-					if (groupRelationRepository
+					if (this.groupRelationRepository
 							.findById(new GroupRelationPK(f.getId().getParentId(), f.getId().getGroupId()))
 							.orElse(null) == null)
 						buildTree(leaf);
@@ -115,9 +108,9 @@ public class GroupServiceImpl extends AbstractPreserveScope implements GroupServ
 
 	@Override
 	@ResponseStatus(code = HttpStatus.CREATED)
-	@PreAuthorize("hasAuthority('SCOPE_"+SCOPE_ADMIN_CREATE+"') or hasRole('ROLE_"+ROLE_ADMIN+"')")
+	@ScopePermission(scope = SCOPE_ADMIN_CREATE)
 	public Group create(Group group) {
-		return groupRepository.save(group);
+		return this.groupRepository.save(group);
 	}
 
 	@Override
@@ -129,71 +122,72 @@ public class GroupServiceImpl extends AbstractPreserveScope implements GroupServ
 	}
 
 	@Override
-	@PreAuthorize("hasAuthority('SCOPE_"+SCOPE_ADMIN_UPDATE+"') or hasRole('ROLE_"+ROLE_ADMIN+"')")
+	@ScopePermission(scope = SCOPE_ADMIN_UPDATE)
 	public Group update(String groupId, Map<String, Object> map) {
-		Group source = groupRepository.getById(groupId);
+		Group source = this.groupRepository.getById(groupId);
 		PatchUpdateHelper.merge(source, map);
-		return groupRepository.save(source);
+		return this.groupRepository.save(source);
 	}
 
 	@Override
 	@ResponseStatus(code = HttpStatus.NO_CONTENT)
-	@PreAuthorize("hasAuthority('SCOPE_"+SCOPE_ADMIN_DELETE+"') or hasRole('ROLE_"+ROLE_SUPER_ADMIN+"')")
+	@ScopePermission(scope = SCOPE_ADMIN_DELETE)
 	public void delete(List<String> ids) {
-		groupRepository.deleteByIdIn(ids.toArray(new String[] {}));
+		this.groupRepository.deleteByIdIn(ids.toArray(new String[] {}));
 	}
 
 	@Override
-	@PreAuthorize("hasAuthority('SCOPE_"+SCOPE_ADMIN_LIST+"') or hasRole('ROLE_"+ROLE_ADMIN+"')")
+	@ScopePermission(scope = SCOPE_ADMIN_LIST)
 	public Page<Group> all(@Nullable Pageable pageable, @Nullable Group group) {
-		return groupRepository.search(group, pageable);
+		return this.groupRepository.search(group, pageable);
 	}
 
 	@Override
-	@PreAuthorize("hasAuthority('SCOPE_"+SCOPE_ADMIN_PARENT_ORG_LIST+"') or hasRole('ROLE_"+ROLE_ADMIN+"')")
+	@ScopePermission(scope = SCOPE_ADMIN_PARENT_ORG_LIST)
 	public Page<OrganizationGroup> getParentOrgs(String groupId, Pageable pageable) {
-		return organizationGroupRepository.findByIdGroupId(groupId, pageable);
+		return this.organizationGroupRepository.findByIdGroupId(groupId, pageable);
 	}
 
 	@Override
 	@Transactional
 	@ResponseStatus(code = HttpStatus.NO_CONTENT)
-	@PreAuthorize("hasAuthority('SCOPE_"+SCOPE_ADMIN_PARENT_ORG_ADD+"') or hasRole('ROLE_"+ROLE_ADMIN+"')")
+	@ScopePermission(scope = SCOPE_ADMIN_PARENT_ORG_ADD)
 	public void setParentOrgs(String groupId, List<String> orgs) {
 		orgs.forEach(f -> {
-			organizationGroupRepository.save(new OrganizationGroup(f, groupId));
+			this.organizationGroupRepository.save(new OrganizationGroup(f, groupId));
 		});
 	}
 
 	@Override
 	@Transactional
 	@ResponseStatus(code = HttpStatus.NO_CONTENT)
-	@PreAuthorize("hasAuthority('SCOPE_"+SCOPE_ADMIN_PARENT_ORG_REMOVE+"') or hasRole('ROLE_"+ROLE_SUPER_ADMIN+"')")
+	@ScopePermission(scope = SCOPE_ADMIN_PARENT_ORG_REMOVE)
 	public void removeParentOrgs(String groupId, List<String> orgs) {
 		orgs.forEach(f -> {
-			organizationGroupRepository.deleteById(new OrganizationGroupPK(f, groupId));
+			this.organizationGroupRepository.deleteById(new OrganizationGroupPK(f, groupId));
 		});
 	}
 
 	@Override
-	@PreAuthorize("hasAuthority('SCOPE_"+SCOPE_ADMIN_MEMBER_LIST+"') or hasRole('ROLE_"+ROLE_ADMIN+"')")
+	@ScopePermission(scope = SCOPE_ADMIN_MEMBER_LIST)
 	public Page<?> getMembers(String groupId, @NotNull GroupTypeEnum type, Pageable pageable) {
 		switch (type) {
 		case EMPLOYEE:
-			Page<GroupEmployee> employees = groupEmployeeRepository.findByIdGroupId(groupId, pageable);
-			employees.getContent().stream().map(m -> employeeRepository.findById(m.getId().getEmployeeId()));
+			Page<GroupEmployee> employees = this.groupEmployeeRepository.findByIdGroupId(groupId, pageable);
+			employees.getContent().stream().map(m -> this.employeeRepository.findById(m.getId().getEmployeeId()));
 			return employees;
 		case ORGANIZATION:
-			Page<GroupOrganization> orgs = groupOrganizationRepository.findByIdGroupId(groupId, pageable);
-			orgs.getContent().stream().map(m -> organizationRepository.findById(m.getId().getGroupId()));
+			Page<GroupOrganization> orgs = this.groupOrganizationRepository.findByIdGroupId(groupId, pageable);
+			orgs.getContent().stream().map(m -> this.organizationRepository.findById(m.getId().getGroupId()));
 			return orgs;
 		case ROLE:
-			Page<GroupRole> roles = groupRoleRepository.findByIdGroupId(groupId, pageable);
-			roles.getContent().stream().map(m -> roleRepository.findById(m.getId().getRoleId()));
+			Page<GroupRole> roles = this.groupRoleRepository.findByIdGroupId(groupId, pageable);
+			roles.getContent().stream().map(m -> this.roleRepository.findById(m.getId().getRoleId()));
 			return roles;
 		case LEVEL:
-			Page<GroupPositionLevel> levels = groupLevelRepository.findByIdGroupId(groupId, pageable);
-			levels.getContent().stream().map(m -> positionLevelRepository.findById(m.getId().getPositionLevelId()));
+			Page<GroupPositionLevel> levels = this.groupLevelRepository.findByIdGroupId(groupId, pageable);
+			levels.getContent().stream()
+					.map(m -> this.positionLevelRepository.findById(m.getId().getPositionLevelId()));
 			return levels;
 //		case SYSROLE:
 //			Page<GroupSysrole> sysroles = groupSysroleRepository.findByIdGroupId(groupId, pageable);
@@ -204,8 +198,8 @@ public class GroupServiceImpl extends AbstractPreserveScope implements GroupServ
 //			users.getContent().stream().map(m -> positionLevelRepository.findById(m.getId().getUsername()));
 //			return users;
 		case GROUP:
-			Page<GroupRelation> groups = groupRelationRepository.findByIdParentId(groupId, pageable);
-			groups.getContent().stream().map(m -> positionLevelRepository.findById(m.getId().getGroupId()));
+			Page<GroupRelation> groups = this.groupRelationRepository.findByIdParentId(groupId, pageable);
+			groups.getContent().stream().map(m -> this.positionLevelRepository.findById(m.getId().getGroupId()));
 			return groups;
 		default:
 			break;
@@ -216,21 +210,21 @@ public class GroupServiceImpl extends AbstractPreserveScope implements GroupServ
 	@Override
 	@Transactional
 	@ResponseStatus(code = HttpStatus.NO_CONTENT)
-	@PreAuthorize("hasAuthority('SCOPE_"+SCOPE_ADMIN_MEMBER_ADD+"') or hasRole('ROLE_"+ROLE_ADMIN+"')")
+	@ScopePermission(scope = SCOPE_ADMIN_MEMBER_ADD)
 	public void addMembers(String groupId, @NotNull GroupTypeEnum type, List<Object> memberIds) {
 		memberIds.forEach(f -> {
 			switch (type) {
 			case EMPLOYEE:
-				groupEmployeeRepository.save(new GroupEmployee(groupId, f.toString()));
+				this.groupEmployeeRepository.save(new GroupEmployee(groupId, f.toString()));
 				break;
 			case ORGANIZATION:
-				groupOrganizationRepository.save(new GroupOrganization(groupId, f.toString()));
+				this.groupOrganizationRepository.save(new GroupOrganization(groupId, f.toString()));
 				break;
 			case ROLE:
-				groupRoleRepository.save(new GroupRole(groupId, f.toString()));
+				this.groupRoleRepository.save(new GroupRole(groupId, f.toString()));
 				break;
 			case LEVEL:
-				groupLevelRepository.save(new GroupPositionLevel(groupId, f.toString()));
+				this.groupLevelRepository.save(new GroupPositionLevel(groupId, f.toString()));
 				break;
 //			case SYSROLE:
 //				groupSysroleRepository.save(new GroupSysrole(groupId, f.toString()));
@@ -239,7 +233,7 @@ public class GroupServiceImpl extends AbstractPreserveScope implements GroupServ
 //				groupUserRepository.save(new GroupUser(groupId, f.toString()));
 //				break;
 			case GROUP:
-				groupRelationRepository.save(new GroupRelation(f.toString(),groupId));
+				this.groupRelationRepository.save(new GroupRelation(f.toString(), groupId));
 				break;
 			default:
 				break;
@@ -250,21 +244,21 @@ public class GroupServiceImpl extends AbstractPreserveScope implements GroupServ
 	@Override
 	@Transactional
 	@ResponseStatus(code = HttpStatus.NO_CONTENT)
-	@PreAuthorize("hasAuthority('SCOPE_"+SCOPE_ADMIN_MEMBER_REMOVE+"') or hasRole('ROLE_"+ROLE_SUPER_ADMIN+"')")
+	@ScopePermission(scope = SCOPE_ADMIN_MEMBER_REMOVE)
 	public void removeMembers(String groupId, @NotNull GroupTypeEnum type, List<Object> memberIds) {
 		memberIds.forEach(f -> {
 			switch (type) {
 			case EMPLOYEE:
-				groupEmployeeRepository.deleteById(new GroupEmployeePK(groupId, f.toString()));
+				this.groupEmployeeRepository.deleteById(new GroupEmployeePK(groupId, f.toString()));
 				break;
 			case ORGANIZATION:
-				groupOrganizationRepository.deleteById(new GroupOrganizationPK(groupId, f.toString()));
+				this.groupOrganizationRepository.deleteById(new GroupOrganizationPK(groupId, f.toString()));
 				break;
 			case ROLE:
-				groupRoleRepository.deleteById(new GroupRolePK(groupId, f.toString()));
+				this.groupRoleRepository.deleteById(new GroupRolePK(groupId, f.toString()));
 				break;
 			case LEVEL:
-				groupLevelRepository.deleteById(new GroupPositionLevelPK(groupId, f.toString()));
+				this.groupLevelRepository.deleteById(new GroupPositionLevelPK(groupId, f.toString()));
 				break;
 //			case SYSROLE:
 //				groupSysroleRepository.deleteById(new GroupSysrolePK(groupId, f.toString()));
@@ -273,7 +267,7 @@ public class GroupServiceImpl extends AbstractPreserveScope implements GroupServ
 //				groupUserRepository.deleteById(new GroupUserPK(groupId, f.toString()));
 //				break;
 			case GROUP:
-				groupRelationRepository.deleteById(new GroupRelationPK(f.toString(),groupId));
+				this.groupRelationRepository.deleteById(new GroupRelationPK(f.toString(), groupId));
 			default:
 				break;
 			}
@@ -281,8 +275,8 @@ public class GroupServiceImpl extends AbstractPreserveScope implements GroupServ
 	}
 
 	@Override
-	@PreAuthorize("hasAuthority('SCOPE_"+SCOPE_ADMIN_READ+"') or hasRole('ROLE_"+ROLE_ADMIN+"')")
+	@ScopePermission(scope = SCOPE_ADMIN_READ)
 	public Group get(String groupId) {
-		return groupRepository.findById(groupId).orElse(null);
+		return this.groupRepository.findById(groupId).orElse(null);
 	}
 }
