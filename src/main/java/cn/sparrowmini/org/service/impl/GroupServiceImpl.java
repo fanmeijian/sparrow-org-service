@@ -7,6 +7,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -62,7 +63,7 @@ import cn.sparrowmini.org.service.scope.GroupScope;
 @Service
 public class GroupServiceImpl extends AbstractPreserveScope implements GroupService, GroupScope {
 
-	@Autowired
+	@Qualifier("PemGroupUserRepository")
 	GroupUserRepository groupUserRepository;
 	@Autowired
 	GroupOrganizationRepository groupOrganizationRepository;
@@ -72,7 +73,7 @@ public class GroupServiceImpl extends AbstractPreserveScope implements GroupServ
 	GroupLevelRepository groupLevelRepository;
 	@Autowired
 	GroupRelationRepository groupRelationRepository;
-	@Autowired
+	@Qualifier("PemGroupSysroleRepository")
 	GroupSysroleRepository groupSysroleRepository;
 
 	@Autowired

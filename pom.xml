@@ -67,7 +67,13 @@
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>cn.sparrowmini</groupId>
+            <artifactId>sparrow-common-api</artifactId>
+            <version>0.2.0</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 	<build>
 		<plugins>
 			<plugin>
