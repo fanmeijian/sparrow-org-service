@@ -32,75 +32,75 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "role", description = "岗位服务")
 @RequestMapping("/roles")
 public interface RoleRestService {
-	@Operation(summary = "岗位员工列表")
+	@Operation(summary = "岗位员工列表", operationId = "roleEmployees")
 	@GetMapping("/{organizationRoleId}/employees")
 	@ResponseBody
 	public List<Employee> getEmployees(
 			@Parameter(example = "organizationId_roleId", schema = @Schema(implementation = String.class)) @PathVariable("organizationRoleId") OrganizationRolePK organizationRoleId);
 
-	@Operation(summary = "获取下属岗位")
+	@Operation(summary = "获取下属岗位", operationId = "roleChildren")
 	@GetMapping("/{organizationRoleId}/children")
 	@ResponseBody
 	public List<OrganizationRoleRelation> getChildren(
 			@Parameter(example = "organizationId_roleId", schema = @Schema(implementation = String.class)) @PathVariable("organizationRoleId") OrganizationRolePK organizationRoleId);
 
-	@Operation(summary = "获取上级岗位")
+	@Operation(summary = "获取上级岗位", operationId = "roleParent")
 	@GetMapping("/{organizationRoleId}/parents")
 	@ResponseBody
 	public List<OrganizationRoleRelation> getParents(
 			@Parameter(example = "organizationId_roleId", schema = @Schema(implementation = String.class)) @PathVariable("organizationRoleId") OrganizationRolePK organizationRoleId);
 
-	@Operation(summary = "设置上级岗位")
+	@Operation(summary = "设置上级岗位", operationId = "addRoleParent")
 	@PostMapping("/{organizationRoleId}/parents")
 	@ResponseBody
 	public void addParents(
 			@Parameter(example = "organizationId_roleId", schema = @Schema(implementation = String.class)) @PathVariable("organizationRoleId") OrganizationRolePK organizationRoleId,
 			@NotNull @RequestBody List<OrganizationRolePK> ids);
 
-	@Operation(summary = "移除上级岗位")
+	@Operation(summary = "移除上级岗位", operationId = "removeRoleParent")
 	@PutMapping("/{organizationRoleId}/parents/delete")
 	@ResponseBody
 	public void delParents(
 			@Parameter(example = "organizationId_roleId", schema = @Schema(implementation = String.class)) @PathVariable("organizationRoleId") OrganizationRolePK organizationRoleId,
 			@NotNull @RequestBody List<OrganizationRolePK> ids);
 
-	@Operation(summary = "岗位所属的组织")
+	@Operation(summary = "岗位所属的组织", operationId = "roleParentOrgs")
 	@GetMapping("/{roleId}/parentOrganizations")
 	@ResponseBody
 	public List<OrganizationRole> getParentOrganizations(@PathVariable("roleId") String roleId);
 
-	@Operation(summary = "岗位详情")
+	@Operation(summary = "岗位详情", operationId = "role")
 	@GetMapping("/{roleId}")
 	@ResponseBody
 	public Role get(@PathVariable("roleId") String roleId);
 
-	@Operation(summary = "设置岗位所属组织")
+	@Operation(summary = "设置岗位所属组织", operationId = "addRoleParentOrg")
 	@PostMapping("/{roleId}/parentOrganizations")
 	@ResponseBody
 	public void setParentOrg(@PathVariable("roleId") String roleId, @RequestBody List<String> orgs);
 
-	@Operation(summary = "移除岗位所属组织")
+	@Operation(summary = "移除岗位所属组织", operationId = "removeRoleParentOrg")
 	@PutMapping("/{roleId}/parentOrganizations/delete")
 	@ResponseBody
 	public void removeParentOrg(@PathVariable("roleId") String roleId, @RequestBody List<String> orgs);
 
-	@Operation(summary = "岗位列表")
+	@Operation(summary = "岗位列表", operationId = "roles")
 	@GetMapping("")
 	@ResponseBody
 	public Page<Role> all(@Nullable Pageable pageable, @Nullable Role role);
 
-	@Operation(summary = "新增岗位")
+	@Operation(summary = "新增岗位", operationId = "newRole")
 	@PostMapping("")
 	@ResponseBody
 	public Role create(@NotNull @RequestBody Role role);
 
-	@Operation(summary = "更新岗位")
+	@Operation(summary = "更新岗位", operationId = "updateRole")
 	@PatchMapping("/{roleId}")
 	@ResponseBody
 	@io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(implementation = Role.class)))
 	public Role update(@PathVariable("roleId") String roleId, @RequestBody Map<String, Object> map);
 
-	@Operation(summary = "删除岗位")
+	@Operation(summary = "删除岗位", operationId = "deleteRole")
 	@PutMapping("/delete")
 	@ResponseBody
 	public void delete(@NotNull @RequestBody final String[] ids);

@@ -4,6 +4,7 @@ package cn.sparrowmini.org.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
@@ -32,86 +33,86 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/employees")
 public interface EmployeeService {
 
-	@Operation(summary = "新增员工")
+	@Operation(summary = "新增员工",operationId = "newEmployee")
 	@PostMapping("")
 	@ResponseBody
 	public Employee create(@RequestBody Employee employee);
 	
-	@Operation(summary = "员工详情")
+	@Operation(summary = "员工详情",operationId = "employee")
 	@GetMapping("/{employeeId}")
 	@ResponseBody
 	public Employee get(@PathVariable("employeeId") String employeeId);
 	
-	@Operation(summary = "员工详情")
+	@Operation(summary = "员工列表",operationId = "employees")
 	@GetMapping("/all")
 	@ResponseBody
-	public Page<Employee> all(@Nullable Pageable pageable,@Nullable Employee employee);
+	public Page<Employee> all(@Nullable @ParameterObject Pageable pageable,@Nullable Employee employee);
 
-	@Operation(summary = "更新员工")
+	@Operation(summary = "更新员工", operationId = "updateEmployee")
 	@PatchMapping("/{employeeId}")
 	@ResponseBody
 	@io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(implementation = Employee.class)))
 	public Employee update(@PathVariable("employeeId") String employeeId,@RequestBody Map<String, Object> map);
 
-	@Operation(summary = "删除员工")
+	@Operation(summary = "删除员工",operationId = "deleteEmployee")
 	@PutMapping("/delete")
 	@ResponseBody
 	public void delete(@RequestBody String[] ids);
 
-	@Operation(summary = "获取直接下属")
+	@Operation(summary = "获取直接下属", operationId = "employeeChildren")
 	@GetMapping("/{employeeId}/children")
 	@ResponseBody
 	public List<EmployeeRelation> getChildren(@PathVariable("employeeId") String employeeId);
 
-	@Operation(summary = "获取直接上级")
+	@Operation(summary = "获取直接上级", operationId = "employeeParent")
 	@GetMapping("/{employeeId}/parents")
 	@ResponseBody
 	public List<EmployeeRelation> getParents(@PathVariable("employeeId") String employeeId);
 
-	@Operation(summary = "获取所属职级")
+	@Operation(summary = "获取所属职级",operationId = "employeeLevels")
 	@GetMapping("/{employeeId}/levels")
 	@ResponseBody
 	public List<EmployeeOrganizationLevel> getLevels(@PathVariable("employeeId") String employeeId);
 
-	@Operation(summary = "获取担任岗位")
+	@Operation(summary = "获取担任岗位",operationId = "employeeRoles")
 	@GetMapping("/{employeeId}/roles")
 	@ResponseBody
 	public List<EmployeeOrganizationRole> getRoles(@PathVariable("employeeId") String employeeId);
 
-	@Operation(summary = "获取员工关系树")
+	@Operation(summary = "获取员工关系树", operationId = "employeeTree")
 	@GetMapping("/{employeeId}/tree")
 	@ResponseBody
 	public SparrowTree<Employee, String> tree(@PathVariable("employeeId") String employeeId);
 
-	@Operation(summary = "设置担任岗位")
+	@Operation(summary = "设置担任岗位", operationId = "addEmployeeRole")
 	@PostMapping("/{employeeId}/roles")
 	@ResponseBody
 	public void addRole(@PathVariable("employeeId") String employeeId, @RequestBody List<OrganizationRolePK> organizationRoleIds);
 
-	@Operation(summary = "移除担任岗位")
+	@Operation(summary = "移除担任岗位", operationId = "removeEmployeeRole")
 	@PutMapping("/{employeeId}/roles/delete")
 	@ResponseBody
 	public void removeRole(@PathVariable("employeeId") String employeeId,
 			@RequestBody List<OrganizationRolePK> organizationRoleIds);
 
-	@Operation(summary = "设置所属职级别")
+	@Operation(summary = "设置所属职级别", operationId = "addEmployeeLevel")
 	@PostMapping("/{employeeId}/levels")
 	@ResponseBody
 	public void addLevel(@PathVariable("employeeId") String employeeId,
 			@RequestBody List<OrganizationPositionLevelPK> organizationPositionLevelIds);
 
-	@Operation(summary = "移除所属职级别")
+	@Operation(summary = "移除所属职级别", operationId = "removeEmployeeLevel")
 	@PutMapping("/{employeeId}/levels/delete")
 	@ResponseBody
 	public void removeLevel(@PathVariable("employeeId") String employeeId,
 			@RequestBody List<OrganizationPositionLevelPK> organizationPositionLevelIds);
 
-	@Operation(summary = "设置员工上级")
+	@Operation(summary = "设置员工上级", operationId = "addEmployeeParent")
 	@PostMapping("/{employeeId}/parents")
 	@ResponseBody
 	public void addParent(@PathVariable("employeeId") String employeeId, @RequestBody List<String> parentIds);
 
-	@Operation(summary = "移除员工上级")
+	@Operation(summary = "移除员工上级", operationId = "removeEmployeeParent")
 	@PutMapping("/{employeeId}/parents/delete")
 	@ResponseBody
 	public void removeParent(@PathVariable("employeeId") String employeeId, @RequestBody List<String> parentIds);
