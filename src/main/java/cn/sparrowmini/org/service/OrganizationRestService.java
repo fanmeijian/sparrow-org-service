@@ -86,5 +86,5 @@ public interface OrganizationRestService extends PreserveScope {
 	@Operation(summary = "下级数量", operationId = "orgChildCount")
 	@GetMapping(value = "/{organizationId}/childCount")
 	@ResponseBody
-	public long childCount(@PathVariable String organizationId);
+	public long childCount(@PathVariable String organizationId,OrganizationChildTypeEnum type);
 }

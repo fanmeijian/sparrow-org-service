@@ -42,35 +42,36 @@ import cn.sparrowmini.org.service.repository.OrganizationRelationRepository;
 import cn.sparrowmini.org.service.repository.OrganizationRepository;
 import cn.sparrowmini.org.service.repository.OrganizationRoleRelationRepository;
 import cn.sparrowmini.org.service.repository.OrganizationRoleRepository;
+import cn.sparrowmini.org.service.repository.RoleRepository;
 import cn.sparrowmini.org.service.scope.OrgScope;
 
 @Service
 public class OrganizationServiceImpl extends AbstractPreserveScope implements OrganizationService, OrgScope {
 
 	@Autowired
-	OrganizationRelationRepository organizationRelationRepository;
+	private OrganizationRelationRepository organizationRelationRepository;
 	@Autowired
-	OrganizationRoleRepository organizationRoleRepository;
+	private OrganizationRoleRepository organizationRoleRepository;
 	@Autowired
-	OrganizationRoleRelationRepository organizationRoleRelationRepository;
+	private OrganizationRoleRelationRepository organizationRoleRelationRepository;
 	@Autowired
-	OrganizationLevelRepository organizationLevelRepository;
+	private OrganizationLevelRepository organizationLevelRepository;
 	@Autowired
-	OrganizationPositionLevelRelationRepository organizationPositionLevelRelationRepository;
+	private OrganizationPositionLevelRelationRepository organizationPositionLevelRelationRepository;
 	@Autowired
-	OrganizationGroupRepository organizationGroupRepository;
+	private OrganizationGroupRepository organizationGroupRepository;
 	@Autowired
-	OrganizationRepository organizationRepository;
+	private OrganizationRepository organizationRepository;
 	@Autowired
-	RoleService roleService;
+	private RoleService roleService;
 	@Autowired
-	PositionLevelService levelService;
+	private PositionLevelService levelService;
 	@Autowired
-	GroupService groupService;
+	private GroupService groupService;
 	@Autowired
-	EmployeeRepository employeeRepository;
+	private EmployeeRepository employeeRepository;
 	@Autowired
-	EmployeeService employeeService;
+	private EmployeeService employeeService;
 
 	@Override
 	public Page<OrganizationGroup> getGroups(String organizationId, Pageable pageable) {
@@ -281,7 +282,7 @@ public class OrganizationServiceImpl extends AbstractPreserveScope implements Or
 		case GROUP:
 			return organizationGroupRepository.findByIdOrganizationId(organizationId, pageable);
 		case EMPLOYEE:
-			return employeeRepository.findAllByOrganizationId(organizationId, pageable);
+			return employeeRepository.findByOrganizationId(organizationId, pageable);
 		default:
 			break;
 		}
@@ -289,9 +290,22 @@ public class OrganizationServiceImpl extends AbstractPreserveScope implements Or
 	}
 
 	@Override
-	public long childCount(String organizationId) {
-		long a = organizationRelationRepository.countByIdParentId(organizationId);
-		return a;
+	public long childCount(String organizationId, OrganizationChildTypeEnum type) {
+		switch (type) {
+		case ORGANIZATION:
+			return organizationRelationRepository.countByIdParentId(organizationId);
+		case EMPLOYEE:
+			return this.employeeRepository.countByOrganizationId(organizationId);
+		case ROLE:
+			return this.organizationRoleRepository.countByIdOrganizationId(organizationId);
+		case LEVEL:
+			return this.organizationLevelRepository.countByIdOrganizationId(organizationId);
+		case GROUP:
+			return this.organizationGroupRepository.countByIdOrganizationId(organizationId);
+		default:
+			return 0;
+		}
+
 	}
 
 }
