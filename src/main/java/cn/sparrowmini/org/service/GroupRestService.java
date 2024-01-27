@@ -44,7 +44,7 @@ public interface GroupRestService {
 	@Operation(summary = "群组列表", operationId = "groups")
 	@GetMapping("")
 	@ResponseBody
-	public Page<Group> all(@Nullable @ParameterObject Pageable pageable, @Nullable @ParameterObject Group group);
+	public Page<Group> all(@Nullable @ParameterObject Pageable pageable, @Nullable @ParameterObject CommonFilterBean commonFilterBean);
 
 	@Operation(summary = "组成员列表", operationId = "groupMembers")
 	@GetMapping("/{groupId}/members")

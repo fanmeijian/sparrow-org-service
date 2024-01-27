@@ -8,9 +8,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -21,11 +18,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import cn.sparrowmini.org.model.Employee;
 import cn.sparrowmini.org.model.Role;
-import cn.sparrowmini.org.model.Role_;
 import cn.sparrowmini.org.model.relation.OrganizationRole;
 import cn.sparrowmini.org.model.relation.OrganizationRole.OrganizationRolePK;
 import cn.sparrowmini.org.model.relation.OrganizationRoleRelation;
 import cn.sparrowmini.org.model.relation.OrganizationRoleRelation.OrganizationRoleRelationPK;
+import cn.sparrowmini.org.service.CommonFilterBean;
 import cn.sparrowmini.org.service.RoleService;
 import cn.sparrowmini.org.service.repository.EmployeeOrganizationRoleRepository;
 import cn.sparrowmini.org.service.repository.EmployeeRepository;
@@ -121,9 +118,8 @@ public class RoleServiceImpl extends AbstractPreserveScope implements RoleServic
 
 	@Override
 	@PreAuthorize("hasAuthority('SCOPE_"+SCOPE_ADMIN_LIST+"') or hasRole('ROLE_"+ROLE_ADMIN+"')")
-	public Page<Role> all(Pageable pageable, Role role) {
-		ExampleMatcher matcher = ExampleMatcher.matching().withIgnorePaths(Role_.IS_ROOT).withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING);
-		return roleRepository.findAll(Example.of(role, matcher), pageable);
+	public Page<Role> all(Pageable pageable, CommonFilterBean commonFilterBean) {
+		return roleRepository.findAll(commonFilterBean.toRoleExample(), pageable);
 	}
 
 	@Override

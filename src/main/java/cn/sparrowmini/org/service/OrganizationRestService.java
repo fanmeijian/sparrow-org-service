@@ -82,4 +82,9 @@ public interface OrganizationRestService extends PreserveScope {
 	@GetMapping("/{organizationId}")
 	@ResponseBody
 	public Organization get(@PathVariable("organizationId") String organizationId);
+	
+	@Operation(summary = "下级数量", operationId = "orgChildCount")
+	@GetMapping(value = "/{organizationId}/childCount")
+	@ResponseBody
+	public long childCount(@PathVariable String organizationId);
 }

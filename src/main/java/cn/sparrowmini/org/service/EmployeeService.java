@@ -1,8 +1,8 @@
 package cn.sparrowmini.org.service;
 
-
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
@@ -21,6 +21,7 @@ import cn.sparrowmini.org.model.Employee;
 import cn.sparrowmini.org.model.relation.EmployeeOrganizationLevel;
 import cn.sparrowmini.org.model.relation.EmployeeOrganizationRole;
 import cn.sparrowmini.org.model.relation.EmployeeRelation;
+import cn.sparrowmini.org.model.relation.GroupEmployee;
 import cn.sparrowmini.org.model.relation.OrganizationPositionLevel.OrganizationPositionLevelPK;
 import cn.sparrowmini.org.model.relation.OrganizationRole.OrganizationRolePK;
 import cn.sparrowmini.org.service.impl.SparrowTree;
@@ -33,28 +34,29 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/employees")
 public interface EmployeeService {
 
-	@Operation(summary = "新增员工",operationId = "newEmployee")
+	@Operation(summary = "新增员工", operationId = "newEmployee")
 	@PostMapping("")
 	@ResponseBody
 	public Employee create(@RequestBody Employee employee);
-	
-	@Operation(summary = "员工详情",operationId = "employee")
+
+	@Operation(summary = "员工详情", operationId = "employee")
 	@GetMapping("/{employeeId}")
 	@ResponseBody
 	public Employee get(@PathVariable("employeeId") String employeeId);
-	
-	@Operation(summary = "员工列表",operationId = "employees")
+
+	@Operation(summary = "员工列表", operationId = "employees")
 	@GetMapping("/all")
 	@ResponseBody
-	public Page<Employee> all(@Nullable @ParameterObject Pageable pageable,@Nullable Employee employee);
+	public Page<Employee> all(@Nullable @ParameterObject Pageable pageable,
+			@Nullable @ParameterObject CommonFilterBean commonFilterBean);
 
 	@Operation(summary = "更新员工", operationId = "updateEmployee")
 	@PatchMapping("/{employeeId}")
 	@ResponseBody
 	@io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(implementation = Employee.class)))
-	public Employee update(@PathVariable("employeeId") String employeeId,@RequestBody Map<String, Object> map);
+	public Employee update(@PathVariable("employeeId") String employeeId, @RequestBody Map<String, Object> map);
 
-	@Operation(summary = "删除员工",operationId = "deleteEmployee")
+	@Operation(summary = "删除员工", operationId = "deleteEmployee")
 	@PutMapping("/delete")
 	@ResponseBody
 	public void delete(@RequestBody String[] ids);
@@ -69,12 +71,12 @@ public interface EmployeeService {
 	@ResponseBody
 	public List<EmployeeRelation> getParents(@PathVariable("employeeId") String employeeId);
 
-	@Operation(summary = "获取所属职级",operationId = "employeeLevels")
+	@Operation(summary = "获取所属职级", operationId = "employeeLevels")
 	@GetMapping("/{employeeId}/levels")
 	@ResponseBody
 	public List<EmployeeOrganizationLevel> getLevels(@PathVariable("employeeId") String employeeId);
 
-	@Operation(summary = "获取担任岗位",operationId = "employeeRoles")
+	@Operation(summary = "获取担任岗位", operationId = "employeeRoles")
 	@GetMapping("/{employeeId}/roles")
 	@ResponseBody
 	public List<EmployeeOrganizationRole> getRoles(@PathVariable("employeeId") String employeeId);
@@ -87,7 +89,8 @@ public interface EmployeeService {
 	@Operation(summary = "设置担任岗位", operationId = "addEmployeeRole")
 	@PostMapping("/{employeeId}/roles")
 	@ResponseBody
-	public void addRole(@PathVariable("employeeId") String employeeId, @RequestBody List<OrganizationRolePK> organizationRoleIds);
+	public void addRole(@PathVariable("employeeId") String employeeId,
+			@RequestBody List<OrganizationRolePK> organizationRoleIds);
 
 	@Operation(summary = "移除担任岗位", operationId = "removeEmployeeRole")
 	@PutMapping("/{employeeId}/roles/delete")
@@ -116,6 +119,11 @@ public interface EmployeeService {
 	@PutMapping("/{employeeId}/parents/delete")
 	@ResponseBody
 	public void removeParent(@PathVariable("employeeId") String employeeId, @RequestBody List<String> parentIds);
+
+	@Operation(summary = "获取所属组", operationId = "employeeGroups")
+	@GetMapping("/{employeeId}/groups")
+	@ResponseBody
+	public Set<GroupEmployee> getGroup(@PathVariable("employeeId") String employeeId);
 
 	public long getChildCount(String employeeId);
 

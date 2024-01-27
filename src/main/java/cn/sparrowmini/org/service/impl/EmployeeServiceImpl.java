@@ -2,11 +2,9 @@ package cn.sparrowmini.org.service.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -22,8 +20,10 @@ import cn.sparrowmini.org.model.relation.EmployeeOrganizationRole;
 import cn.sparrowmini.org.model.relation.EmployeeOrganizationRole.EmployeeOrganizationRolePK;
 import cn.sparrowmini.org.model.relation.EmployeeRelation;
 import cn.sparrowmini.org.model.relation.EmployeeRelation.EmployeeRelationPK;
+import cn.sparrowmini.org.model.relation.GroupEmployee;
 import cn.sparrowmini.org.model.relation.OrganizationPositionLevel.OrganizationPositionLevelPK;
 import cn.sparrowmini.org.model.relation.OrganizationRole.OrganizationRolePK;
+import cn.sparrowmini.org.service.CommonFilterBean;
 import cn.sparrowmini.org.service.EmployeeService;
 import cn.sparrowmini.org.service.repository.EmployeeOrganizationLevelRepository;
 import cn.sparrowmini.org.service.repository.EmployeeOrganizationRoleRepository;
@@ -214,9 +214,13 @@ public class EmployeeServiceImpl extends AbstractPreserveScope implements Employ
 
 	@Override
 	@PreAuthorize("hasAuthority('SCOPE_"+SCOPE_ADMIN_LIST+"') or hasRole('ROLE_"+ROLE_ADMIN+"')")
-	public Page<Employee> all(Pageable pageable, Employee employee) {
-		ExampleMatcher matcher = ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING);
-		return employeeRepository.findAll(Example.of(employee, matcher), pageable);
+	public Page<Employee> all(Pageable pageable, CommonFilterBean commonFilterBean) {
+		return employeeRepository.findAll(commonFilterBean.toEmployeeExample(), pageable);
+	}
+
+	@Override
+	public Set<GroupEmployee> getGroup(String employeeId) {
+		return this.employeeRepository.findById(employeeId).get().getGroupEmployees();
 	}
 
 }

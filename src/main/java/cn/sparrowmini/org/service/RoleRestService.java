@@ -1,11 +1,11 @@
 package cn.sparrowmini.org.service;
 
-
 import java.util.List;
 import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
@@ -24,7 +24,6 @@ import cn.sparrowmini.org.model.relation.OrganizationRole;
 import cn.sparrowmini.org.model.relation.OrganizationRole.OrganizationRolePK;
 import cn.sparrowmini.org.model.relation.OrganizationRoleRelation;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,35 +32,30 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/roles")
 public interface RoleRestService {
 	@Operation(summary = "岗位员工列表", operationId = "roleEmployees")
-	@GetMapping("/{organizationRoleId}/employees")
+	@GetMapping("/employees")
 	@ResponseBody
-	public List<Employee> getEmployees(
-			@Parameter(example = "organizationId_roleId", schema = @Schema(implementation = String.class)) @PathVariable("organizationRoleId") OrganizationRolePK organizationRoleId);
+	public List<Employee> getEmployees(@ParameterObject OrganizationRolePK organizationRoleId);
 
 	@Operation(summary = "获取下属岗位", operationId = "roleChildren")
-	@GetMapping("/{organizationRoleId}/children")
+	@GetMapping("/children")
 	@ResponseBody
-	public List<OrganizationRoleRelation> getChildren(
-			@Parameter(example = "organizationId_roleId", schema = @Schema(implementation = String.class)) @PathVariable("organizationRoleId") OrganizationRolePK organizationRoleId);
+	public List<OrganizationRoleRelation> getChildren(@ParameterObject OrganizationRolePK organizationRoleId);
 
 	@Operation(summary = "获取上级岗位", operationId = "roleParent")
-	@GetMapping("/{organizationRoleId}/parents")
+	@GetMapping("/parents")
 	@ResponseBody
-	public List<OrganizationRoleRelation> getParents(
-			@Parameter(example = "organizationId_roleId", schema = @Schema(implementation = String.class)) @PathVariable("organizationRoleId") OrganizationRolePK organizationRoleId);
+	public List<OrganizationRoleRelation> getParents(@ParameterObject OrganizationRolePK organizationRoleId);
 
 	@Operation(summary = "设置上级岗位", operationId = "addRoleParent")
-	@PostMapping("/{organizationRoleId}/parents")
+	@PostMapping("/parents")
 	@ResponseBody
-	public void addParents(
-			@Parameter(example = "organizationId_roleId", schema = @Schema(implementation = String.class)) @PathVariable("organizationRoleId") OrganizationRolePK organizationRoleId,
+	public void addParents(@ParameterObject OrganizationRolePK organizationRoleId,
 			@NotNull @RequestBody List<OrganizationRolePK> ids);
 
 	@Operation(summary = "移除上级岗位", operationId = "removeRoleParent")
-	@PutMapping("/{organizationRoleId}/parents/delete")
+	@PutMapping("/parents/remove")
 	@ResponseBody
-	public void delParents(
-			@Parameter(example = "organizationId_roleId", schema = @Schema(implementation = String.class)) @PathVariable("organizationRoleId") OrganizationRolePK organizationRoleId,
+	public void delParents(@ParameterObject OrganizationRolePK organizationRoleId,
 			@NotNull @RequestBody List<OrganizationRolePK> ids);
 
 	@Operation(summary = "岗位所属的组织", operationId = "roleParentOrgs")
@@ -80,14 +74,15 @@ public interface RoleRestService {
 	public void setParentOrg(@PathVariable("roleId") String roleId, @RequestBody List<String> orgs);
 
 	@Operation(summary = "移除岗位所属组织", operationId = "removeRoleParentOrg")
-	@PutMapping("/{roleId}/parentOrganizations/delete")
+	@PutMapping("/{roleId}/parentOrganizations/remove")
 	@ResponseBody
 	public void removeParentOrg(@PathVariable("roleId") String roleId, @RequestBody List<String> orgs);
 
 	@Operation(summary = "岗位列表", operationId = "roles")
 	@GetMapping("")
 	@ResponseBody
-	public Page<Role> all(@Nullable Pageable pageable, @Nullable Role role);
+	public Page<Role> all(@Nullable @ParameterObject Pageable pageable,
+			@Nullable @ParameterObject CommonFilterBean commonFilterBean);
 
 	@Operation(summary = "新增岗位", operationId = "newRole")
 	@PostMapping("")
