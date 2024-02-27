@@ -71,7 +71,9 @@ public class PositionLevelServiceImpl extends AbstractPreserveScope implements P
 	@ResponseStatus(code = HttpStatus.NO_CONTENT)
 	@PreAuthorize("hasAuthority('SCOPE_" + SCOPE_ADMIN_DELETE + "') or hasRole('ROLE_" + ROLE_SUPER_ADMIN + "')")
 	public void delete(String[] ids) {
-		levelRepository.deleteByIdIn(ids);
+		this.employeeOrganizationLevelRepository.deleteByLevelId(ids);
+		this.organizationLevelRepository.deleteByIdPositionLevelIdIn(ids);
+		this.levelRepository.deleteByIdIn(ids);
 	}
 
 	@Override
@@ -117,7 +119,7 @@ public class PositionLevelServiceImpl extends AbstractPreserveScope implements P
 	@Transactional
 	@PreAuthorize("hasAuthority('SCOPE_" + SCOPE_ADMIN_UPDATE + "') or hasRole('ROLE_" + ROLE_ADMIN + "')")
 	public PositionLevel update(String positionLevelId, Map<String, Object> map) {
-		PositionLevel source = levelRepository.getById(positionLevelId);
+		PositionLevel source = levelRepository.getReferenceById(positionLevelId);
 		PatchUpdateHelper.merge(source, map);
 		return levelRepository.save(source);
 	}

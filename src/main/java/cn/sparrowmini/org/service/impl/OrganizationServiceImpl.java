@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import cn.sparrowmini.org.model.Employee;
 import cn.sparrowmini.org.model.Organization;
 import cn.sparrowmini.org.model.constant.OrganizationChildTypeEnum;
+import cn.sparrowmini.org.model.constant.OrganizationTypeEnum;
 import cn.sparrowmini.org.model.relation.OrganizationGroup;
 import cn.sparrowmini.org.model.relation.OrganizationGroup.OrganizationGroupPK;
 import cn.sparrowmini.org.model.relation.OrganizationPositionLevel;
@@ -28,21 +29,14 @@ import cn.sparrowmini.org.model.relation.OrganizationRelation;
 import cn.sparrowmini.org.model.relation.OrganizationRelation.OrganizationRelationPK;
 import cn.sparrowmini.org.model.relation.OrganizationRole;
 import cn.sparrowmini.org.model.relation.OrganizationRole.OrganizationRolePK;
-import cn.sparrowmini.org.service.EmployeeService;
-import cn.sparrowmini.org.service.GroupService;
 import cn.sparrowmini.org.service.OrganizationService;
-import cn.sparrowmini.org.service.PositionLevelService;
-import cn.sparrowmini.org.service.RoleService;
 import cn.sparrowmini.org.service.ScopePermission;
 import cn.sparrowmini.org.service.repository.EmployeeRepository;
 import cn.sparrowmini.org.service.repository.OrganizationGroupRepository;
 import cn.sparrowmini.org.service.repository.OrganizationLevelRepository;
-import cn.sparrowmini.org.service.repository.OrganizationPositionLevelRelationRepository;
 import cn.sparrowmini.org.service.repository.OrganizationRelationRepository;
 import cn.sparrowmini.org.service.repository.OrganizationRepository;
-import cn.sparrowmini.org.service.repository.OrganizationRoleRelationRepository;
 import cn.sparrowmini.org.service.repository.OrganizationRoleRepository;
-import cn.sparrowmini.org.service.repository.RoleRepository;
 import cn.sparrowmini.org.service.scope.OrgScope;
 
 @Service
@@ -53,25 +47,13 @@ public class OrganizationServiceImpl extends AbstractPreserveScope implements Or
 	@Autowired
 	private OrganizationRoleRepository organizationRoleRepository;
 	@Autowired
-	private OrganizationRoleRelationRepository organizationRoleRelationRepository;
-	@Autowired
 	private OrganizationLevelRepository organizationLevelRepository;
-	@Autowired
-	private OrganizationPositionLevelRelationRepository organizationPositionLevelRelationRepository;
 	@Autowired
 	private OrganizationGroupRepository organizationGroupRepository;
 	@Autowired
 	private OrganizationRepository organizationRepository;
 	@Autowired
-	private RoleService roleService;
-	@Autowired
-	private PositionLevelService levelService;
-	@Autowired
-	private GroupService groupService;
-	@Autowired
 	private EmployeeRepository employeeRepository;
-	@Autowired
-	private EmployeeService employeeService;
 
 	@Override
 	public Page<OrganizationGroup> getGroups(String organizationId, Pageable pageable) {
@@ -229,8 +211,12 @@ public class OrganizationServiceImpl extends AbstractPreserveScope implements Or
 	@Override
 	@PreAuthorize("hasAuthority('SCOPE_" + SCOPE_ADMIN_UPDATE + "') or hasRole('ROLE_" + ROLE_ADMIN + "')")
 	public Organization update(String id, Map<String, Object> map) {
-		Organization source = organizationRepository.getById(id);
-		PatchUpdateHelper.merge(source, map);
+		Organization source = organizationRepository.getReferenceById(id);
+		source.setCode(map.get("code").toString());
+		source.setName(map.get("name").toString());
+//		source.setStat(map.get("stat").toString());
+		source.setIsRoot((Boolean) map.get("isRoot"));
+		source.setType(OrganizationTypeEnum.valueOf(map.get("type").toString()));
 		return organizationRepository.save(source);
 	}
 
@@ -241,7 +227,7 @@ public class OrganizationServiceImpl extends AbstractPreserveScope implements Or
 	public void removeParent(String organizationId, List<String> parentIds) {
 		parentIds.forEach(f -> {
 			if (f.equals("root")) {
-				Organization organization = organizationRepository.getById(organizationId);
+				Organization organization = organizationRepository.getReferenceById(organizationId);
 				organization.setIsRoot(false);
 				organizationRepository.save(organization);
 			} else {
@@ -251,7 +237,7 @@ public class OrganizationServiceImpl extends AbstractPreserveScope implements Or
 
 		// 防止称为孤儿
 		if (organizationRelationRepository.findByIdOrganizationId(organizationId).size() == 0) {
-			Organization organization = organizationRepository.getById(organizationId);
+			Organization organization = organizationRepository.getReferenceById(organizationId);
 			organization.setIsRoot(true);
 			organizationRepository.save(organization);
 		}

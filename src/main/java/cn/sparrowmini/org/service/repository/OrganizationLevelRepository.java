@@ -17,4 +17,6 @@ public interface OrganizationLevelRepository extends JpaRepository<OrganizationP
 
 	Iterable<OrganizationPositionLevel> findByIdPositionLevelId(@NotBlank String positionLevelId);
 
+	void deleteByIdPositionLevelIdIn(String[] ids);
+
 }

@@ -2,6 +2,8 @@ package cn.sparrowmini.org.service.repository;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,5 +18,7 @@ public interface OrganizationRoleRepository extends JpaRepository<OrganizationRo
 	long countByIdOrganizationId(String id);
 
 	List<OrganizationRole> findByIdRoleId(String roleId);
+
+	void deleteByIdRoleIdIn(@NotNull String[] ids);
 
 }
